@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <!-- Page Specific CSS-->
+       <!-- <link rel="stylesheet" type="text/css" href="/views/login.css">-->
+    <title>Tokens</title>
+
+    <!-- Auth SDK-->
+    <script src="https://global.oktacdn.com/okta-auth-js/4.0.0/okta-auth-js.min.js" type="text/javascript"></script>    
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS, jQuery API-->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.1/js/bootstrap.min.js" integrity="sha384-XEerZL0cuoUbHE4nZReLT7nx9gQrQreJekYhJD9WNWhH8nEW+0c5qq7aIo2Wl30J" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+
+  <body> 
+    <script type="text/javascript">
+    var accessToken = "";
+    var idToken = "";
+    var decodedAccessToken;
+    var decodedIDToken;
+
+      var authClient = new OktaAuth({
+        url: 'https://dev-330389.okta.com',
+        issuer: 'https://dev-330389.okta.com/oauth2/default',
+        //clientId: '0oa19viiksCLoYDZy4x7',
+        redirectUri: 'http://localhost:3000'  //http://localhost:3000/authorization-code/callback
+      });
+
+      //Token Manage is ASYNC so - it returns a Promise w/ a result object
+      //var idToken = authClient.tokenManager.get('idToken');
+      //var accessToken = authClient.tokenManager.get('accessToken');
+      //Get & Print ID Token
+      authClient.tokenManager.get('accessToken').then(function(result) {
+        //console.log(result);
+        //var accessToken = result;
+        //console.log(accessToken);
+        //console.log(accessToken.value);
+        //Post the access token in an HTTP Request
+
+        if(result == undefined) {
+          console.log("TOKEN IS UNDEFINED");
+          window.location.replace("http://localhost:3000/login");
+          
+        }
+        //Token Found
+        else{
+          accessToken = result;
+          $.post( '/tokens', { aT: accessToken.value}, function(data, status){
+            //console.log(data);
+            //console.log(status);
+            if (data == "Bad Request"){
+              window.location.replace("http://localhost:3000/login");
+            }
+            else{
+              decodedAccessToken = authClient.token.decode(accessToken.value);
+              //console.log(decodedAccessToken.header, decodedAccessToken.payload, decodedAccessToken.signature);
+
+              document.getElementById("mainDiv").innerHTML = data;
+              //document.getElementById("aT").innerHTML = accessToken.claims.;
+
+              document.getElementById("EncodedToken").innerHTML = JSON.stringify(accessToken.value, null, 1);
+              document.getElementById("TokenHeader").innerHTML = JSON.stringify(decodedAccessToken.header, null, 1);
+              document.getElementById("TokenPayload").innerHTML = JSON.stringify(decodedAccessToken.payload, null, 2);
+              document.getElementById("TokenSig").innerHTML = JSON.stringify(decodedAccessToken.signature, null, 1); //accessToken.scopes
+            }
+          });
+
+          authClient.tokenManager.get('idToken').then(function(token){
+            if (token && !authClient.tokenManager.hasExpired(token)) {
+                // Token is valid
+                idToken = token;
+                decodedIDToken = authClient.token.decode(idToken.value);
+                //console.log(decodedIDToken.header, decodedIDToken.payload, decodedIDToken.signature)
+
+            } else {
+                // Token has been removed due to expiration or error while renewing
+                window.location.replace("http://localhost:3000/login");
+            }
+            })
+            .catch(function(err) {
+                // handle OAuthError or AuthSdkError (AuthSdkError will be thrown if app is in OAuthCallback state)
+                console.error(err);
+                window.location.replace("http://localhost:3000/login");
+                    });
+
+
+        }
+
+      } ,
+        //Redirect to Login if can't grab an access token
+        function(error) {
+          //console.log(error);
+          window.location.replace("http://localhost:3000/login");
+            }
+      );
+
+
+
+    //ID Token Button Function
+      function itFunction() {
+            //console.log("IT button pusshed");
+            document.getElementById("aButton").classList.remove("active");
+            document.getElementById("iButton").classList.add("active");
+
+            document.getElementById("EncodedToken").innerHTML = JSON.stringify(idToken.value, null, 1);
+            document.getElementById("TokenHeader").innerHTML = JSON.stringify(decodedIDToken.header, null, 1);
+            document.getElementById("TokenPayload").innerHTML = JSON.stringify(decodedIDToken.payload, null, 2);
+            document.getElementById("TokenSig").innerHTML = JSON.stringify(decodedIDToken.signature, null, 1);
+        }
+
+
+    //Access Token Button Function
+    function atFunction() {
+            //console.log("Access button pusshed");
+            document.getElementById("iButton").classList.remove("active");
+            document.getElementById("aButton").classList.add("active");
+
+
+            document.getElementById("EncodedToken").innerHTML = JSON.stringify(accessToken.value, null, 1);
+            document.getElementById("TokenHeader").innerHTML = JSON.stringify(decodedAccessToken.header, null, 1);
+            document.getElementById("TokenPayload").innerHTML = JSON.stringify(decodedAccessToken.payload, null, 2);
+            document.getElementById("TokenSig").innerHTML = JSON.stringify(decodedAccessToken.signature, null, 1);
+        }
+    </script>   
+
+
+    <div id="mainDiv"> </div> 
+
+<!--     <div id="AccessTokenDisplay"> 
+        <pre id="AccessTokenHeader"> </pre>
+        <pre id="AccessTokenPayload"> </pre>
+        <pre id="AccessTokenSig"> </pre>
+    </div>  -->
+    
+
+</body>
+
+</html>

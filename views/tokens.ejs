@@ -1,0 +1,64 @@
+            
+            <div class="container">
+                <div id="messageBox" class="jumbotron">
+                    <h1> Welcome to Okta University </h1>
+
+        <!-- Nav Bar -->
+        <ul class="nav nav-pills">
+          <li class="nav-item">
+            <a class="nav-link" href="/home">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/student">Student</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/teacher">Teacher</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin">Admin</a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle active" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Profile</a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="/profile">Edit Profile</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item active" href="/tokens">Tokens</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/apps">Apps</a>
+            </div>
+          </li>
+        </ul>
+    </div>
+
+    <div class="container bg-light text-dark">
+      <br>
+        <div class="row">
+          <div class="col-9">
+            <button onclick="atFunction()" id="aButton" type="button" class="btn btn-outline-primary active" >Access Token</button>
+            <button onclick="itFunction()" id="iButton" type="button" class="btn  btn-outline-primary" >ID Token</button>    
+          </div>
+
+          <div class="col-4 "> <br> 
+            <h4>Encoded Token: </h4> <br> 
+            
+            <div ><textarea id="EncodedToken" class="text-justify" rows="22" cols="32"> </textarea> </div>
+          </div>
+
+          <div class="col-6" id="DecodedToken" > <br> 
+            <h4>Decoded Token: </h4> <br> 
+
+            <h6 class="text-center text-primary">Header</h6> <br>
+            <div><pre id="TokenHeader" > </pre> </div> 
+            <h6 class="text-center text-primary ">Body (Claims)</h6> <br>
+            <pre id="TokenPayload" >  </pre>
+            <h6 class="text-center text-primary">Signature</h6> <br>
+            <pre id="TokenSig" > </pre>
+
+         </div>
+
+
+
+        </div>
+        <br>
+      </div>
